@@ -1,11 +1,15 @@
 import cv2
 from ultralytics import YOLO
 from Configuration import Configuration as CONFIG
+from Visualizer import Visualizer
+
 
 class Analyser:
     def __init__(self):
         self._tracker_model = YOLO(CONFIG.TRACKER_CKPT_PATH)
         print("===> The tracker model is initialized...")
+
+        self._visualizer_handler = Visualizer()
 
     
     def _track(self, frame):
@@ -20,14 +24,23 @@ class Analyser:
         else:
             ids = results[0].boxes.id.cpu().numpy().astype(int)
 
-        return boxes, classes, ids, confs
+        return {
+            "boxes": boxes,
+            "classes": classes,
+            "ids": ids,
+            "confs": confs
+        }
 
 
-    def __call__(self, frame):
-        boxes, classes, ids, confs = self._track(frame)
+    def __call__(self, frame, frame_index):
+        visualized_frame = frame.copy()
         
-        for box, cls_, id_, conf in zip(boxes, classes, ids, confs):
-            print(box, cls_, id_, conf)
+        prediction_results = self._track(frame)
+
+        visualized_frame = self._visualizer_handler.draw_sections(visualized_frame)
+        visualized_frame = self._visualizer_handler.draw_boxes(visualized_frame, prediction_results)
+
+        cv2.imwrite(f"{frame_index}.png", visualized_frame)
 
 if __name__ == "__main__":
     analyzer = Analyser()
@@ -48,7 +61,7 @@ if __name__ == "__main__":
         if not ret:
             break
 
-        analyzer(frame)
+        analyzer(frame, frame_count)
 
         frame_count += 1
 
