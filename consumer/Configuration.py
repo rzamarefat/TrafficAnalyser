@@ -21,6 +21,8 @@ class Configuration:
     #Visualization
     CAR_BOX_COLOR  = (0, 60, 110)
     PERSON_BOX_COLOR = (90, 90, 255)
+
+    COMPASS_COLOR = (255, 119, 20)
     
     REGIONS_COORDS = {
         "cross": [[369.,485],[499,701],[1440,599],[1115,430]],
