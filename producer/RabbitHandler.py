@@ -1,16 +1,14 @@
 import threading
 from time import sleep
 from pika import ConnectionParameters, BlockingConnection, PlainCredentials
-from Configuration import Rabbit as CONFIG
+from Configuration import Configuration as CONFIG
 import json
 
-class RabbitPublisher(threading.Thread):
+class RabbitHandler(threading.Thread):
     def __init__(self, queue, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.daemon = True
         self.is_running = True
-        self.name = "Publisher"
-
         self.queue = queue
 
         credentials = PlainCredentials(CONFIG.RABBIT_CREDENTIALS_USERNAME, CONFIG.RABBIT_CREDENTIALS_PASSWORD)
@@ -33,10 +31,7 @@ class RabbitPublisher(threading.Thread):
     def stop(self):
         print("Stopping...")
         self.is_running = False
-        # Wait until all the data events have been processed
         self.connection.process_data_events(time_limit=1)
         if self.connection.is_open:
             self.connection.close()
         print("Stopped")
-    
-    
