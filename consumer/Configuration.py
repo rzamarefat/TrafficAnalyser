@@ -13,13 +13,20 @@ class Configuration:
     MODEL_IMGSZ = 960
     TRACKER_CKPT_PATH = os.path.join(root, "weights", "yolo11l.pt")
 
+    # Rabbit
+    RABBIT_CREDENTIALS_USERNAME = "guest"
+    RABBIT_CREDENTIALS_PASSWORD = "guest"
+    RABBIT_IP = "127.0.0.1"
+    CONSUMER_QUEUE_NAME = "traffic-consumer"
+    PRODUCER_QUEUE_NAME = "traffic-producer"
+
     
     VEHICLE_CLASSES = [1, 2, 3, 5, 7]
     PERSON_CLASS = [0]
 
 
     #Visualization
-    CAR_BOX_COLOR  = (0, 60, 110)
+    CAR_BOX_COLOR  = (0, 160, 110)
     PERSON_BOX_COLOR = (90, 90, 255)
 
     COMPASS_COLOR = (255, 119, 20)

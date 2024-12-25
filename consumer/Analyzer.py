@@ -54,7 +54,9 @@ class Analyser:
         directions = ["" for _ in range(len(diffs))]
         
         for i, diff in enumerate(diffs):
-            print(diff)
+            if not(abs(diff[0]) >0.2 and abs(diff[1])>0.2):
+                continue
+
             if diff[0] > 0 and diff[1] > 0:
                 directions[i] = "S"  # x increasing, y increasing
             elif diff[0] < 0 and diff[1] < 0:
@@ -89,13 +91,16 @@ class Analyser:
         visualized_frame = self._visualizer_handler.draw_boxes(visualized_frame, prediction_results, direction_results)
         visualized_frame = self._visualizer_handler.draw_compass(visualized_frame)
 
-        
-
+        # cv2.resize(visualized_frame, (visualized_frame.shape[1]//3, visualized_frame.shape[0]//3))
+        # cv2.imshow("Stream", visualized_frame)
+        # cv2.waitKey(0)
         cv2.imwrite(f"{frame_index}.png", visualized_frame)
 
 if __name__ == "__main__":
     analyzer = Analyser()
     video_path = r"C:\Users\ASUS\Desktop\github_projects\traffic_analyser\videos\01.mp4"
+    # video_path = r"C:\Users\ASUS\Desktop\github_projects\traffic_analyser\videos\Screen_Recording_20241222_164344_YouTube.mp4"
+    # video_path = r"C:\Users\ASUS\Desktop\github_projects\traffic_analyser\videos\0001.mp4"
     cap = cv2.VideoCapture(video_path)
 
     if not cap.isOpened():
