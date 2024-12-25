@@ -1,7 +1,7 @@
 const amqp = require('amqplib');
 const WebSocket = require('ws');
 
-const QUEUE_NAME = 'traffic-producer'; // Match the Python producer's queue name
+const QUEUE_NAME = 'traffic-consumer'; // Match the Python producer's queue name
 
 async function startServer() {
     try {
@@ -24,6 +24,7 @@ async function startServer() {
                     if (msg !== null) {
                         try {
                             const message = JSON.parse(msg.content.toString());
+                            console.log(message)
                             ws.send(JSON.stringify(message)); // Send JSON message to clients
                             channel.ack(msg);
                         } catch (error) {

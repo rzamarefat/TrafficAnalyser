@@ -19,6 +19,8 @@ class Configuration:
     RABBIT_IP = "127.0.0.1"
     CONSUMER_QUEUE_NAME = "traffic-consumer"
     PRODUCER_QUEUE_NAME = "traffic-producer"
+    RABBIT_HOST = "localhost"
+    RABBIT_PORT = "5672" 
 
     
     VEHICLE_CLASSES = [1, 2, 3, 5, 7]

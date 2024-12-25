@@ -74,6 +74,7 @@ class Analyser:
 
 
     def __call__(self, frame, frame_index):
+        metadata = {"frame_index": frame_index}
         visualized_frame = frame.copy()
         
         prediction_results = self._track(frame)
@@ -91,10 +92,7 @@ class Analyser:
         visualized_frame = self._visualizer_handler.draw_boxes(visualized_frame, prediction_results, direction_results)
         visualized_frame = self._visualizer_handler.draw_compass(visualized_frame)
 
-        # cv2.resize(visualized_frame, (visualized_frame.shape[1]//3, visualized_frame.shape[0]//3))
-        # cv2.imshow("Stream", visualized_frame)
-        # cv2.waitKey(0)
-        cv2.imwrite(f"{frame_index}.png", visualized_frame)
+        return visualized_frame, metadata
 
 if __name__ == "__main__":
     analyzer = Analyser()

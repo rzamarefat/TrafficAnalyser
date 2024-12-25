@@ -38,3 +38,5 @@ class RabbitPublisher(threading.Thread):
         if self.connection.is_open:
             self.connection.close()
         print("Stopped")
+    
+    
