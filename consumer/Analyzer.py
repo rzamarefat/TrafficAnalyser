@@ -88,9 +88,8 @@ class Analyser:
             
         self._history_holder["prediction_results"] = prediction_results
 
-        visualized_frame = self._visualizer_handler.draw_sections(visualized_frame)
+        visualized_frame = self._visualizer_handler.draw_zones(visualized_frame)
         visualized_frame = self._visualizer_handler.draw_boxes(visualized_frame, prediction_results, direction_results)
-        visualized_frame = self._visualizer_handler.draw_compass(visualized_frame)
 
         return visualized_frame, metadata
 

@@ -27,9 +27,6 @@ class Producer:
             ret, frame = cap.read()
             if not ret:
                 break
-
-            margin = 150
-            frame = frame[margin:1080-margin,:,:]
             
             timestamp = datetime.today().strftime('%Y-%m-%d')
             data_to_publish = {

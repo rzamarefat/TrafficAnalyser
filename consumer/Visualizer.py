@@ -1,70 +1,90 @@
 from typing import Any
 from Configuration import Configuration as CONFIG
 import cv2
+import os
+import json
 import numpy as np
+
+class ColorPallete:
+    ZONES = {
+            'z1': (255, 131, 67),
+            'z12': (234, 56, 78),
+            'z2': (23, 155, 174),
+            'z3': (65, 88, 166),
+            'z4': (239, 90, 111),
+            'z5': (212, 189, 172),
+            'z6': (67, 89, 23),
+            'z7': (123, 234, 45),
+            'z8': (0, 123, 255),
+            'z9': (123, 0, 255),
+            'z14': (89, 67, 45),
+            'z11': (255, 123, 0),
+            'z10': (12, 255, 78),
+            'z13': (34, 56, 78),
+            'pz2': (200, 200, 0),
+            'pz1': (159, 159, 159),
+            'zz': (255, 2, 255),
+            "nothing": (0,0,0)
+        }
 
 class Visualizer():
     def __init__(self):
-        pass
-    
+        self._parse_scene_composition()
+
     @staticmethod
-    def draw_sections(frame):
-        for section_name in CONFIG.REGIONS_COORDS.keys():
-            opacity=0.3
+    def _get_top_bottom_points(coordinates):
+        p1, p2 = coordinates
+        x1, y1 = p1
+        x2, y2 = p2
+        if x1 > x2 and y1 < y2:
+            adjusted_rectangle = [[x2, y1], [x1, y2]]
+        elif x1 < x2 and y1 < y2:
+            adjusted_rectangle = coordinates
+        elif x1 > x2 and y1>y2:
+            adjusted_rectangle = [[x2, y2], [x1, y1]]
+        
+        return adjusted_rectangle
+    
+    
+    def _parse_scene_composition(self):
+        path_to_config = os.path.join(os.getcwd(), "scene_composition.json")
+        with open(path_to_config, 'r') as file:
+            info = json.load(file)
+        
+
+        self._img_height = info["imageHeight"]
+        self._img_width = info["imageWidth"]
+
+        self._zones = {shape["label"]:self._get_top_bottom_points(shape["points"])  for shape in info["shapes"] if shape["label"].__contains__("z")}
+        self._car_cells = [self._get_top_bottom_points(shape["points"])  for shape in info["shapes"] if shape["label"] == "car_cell"]
+    
+    def draw_cells(self, frame, filled_cells_indixes):
+        overlay = frame.copy()
+    
+        for index, rect in enumerate(self._car_cells):
+            top_left = (int(rect[0][0]), int(rect[0][1]))
+            bottom_right = (int(rect[1][0]), int(rect[1][1]))
+            if index in filled_cells_indixes:
+                color = (0, 0, 255)
+            else:
+                color = (0, 255, 0)
+
+            cv2.rectangle(overlay, top_left, bottom_right, color, -1)
+        cv2.addWeighted(overlay, 0.5, frame, 0.8, 0, frame)
+        
+        return frame
+
+    def draw_zones(self, frame):
+        for k, v in self._zones.items():
+            opacity=0.2
             overlay = frame.copy()
-            points = np.array(CONFIG.REGIONS_COORDS[section_name], np.int32).reshape((-1, 1, 2))
-            color = CONFIG.REGIONS_COLORS[section_name]
-            cv2.fillPoly(overlay, [points], color)
-            cv2.polylines(overlay, [points], isClosed=True, color=color, thickness=2)
+            points = np.array(v, np.int32).reshape((-1, 1, 2))
+            cv2.fillPoly(overlay, [points], ColorPallete.ZONES[k])
+            cv2.polylines(overlay, [points], isClosed=True, color=ColorPallete.ZONES[k], thickness=2)
             cv2.addWeighted(overlay, opacity, frame, 1 - opacity, 0, frame)
-        return frame
-    
-    @staticmethod
-    def draw_compass(frame):
-        height, width, _ = frame.shape
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 2
-        color = CONFIG.COMPASS_COLOR
-        thickness = 2
-        text_color = (255, 255, 255)  # White color for text
-        background_color = (0, 0, 0)  # Black background
 
-        mid_x = width // 2
-        mid_y = height // 2
-
-        # Draw "N" with black background
-        text = 'N'
-        (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
-        text_x = mid_x - 10
-        text_y = 50
-        cv2.rectangle(frame, (text_x - 5, text_y - text_height - 5), (text_x + text_width + 5, text_y + 5), background_color, -1)
-        cv2.putText(frame, text, (text_x, text_y), font, font_scale, text_color, thickness)
-
-        # Draw "S" with black background
-        text = 'S'
-        (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
-        text_x = mid_x - 10
-        text_y = height - 30
-        cv2.rectangle(frame, (text_x - 5, text_y - text_height - 5), (text_x + text_width + 5, text_y + 5), background_color, -1)
-        cv2.putText(frame, text, (text_x, text_y), font, font_scale, text_color, thickness)
-
-        # Draw "E" with black background
-        text = 'E'
-        (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
-        text_x = width - 60
-        text_y = mid_y
-        cv2.rectangle(frame, (text_x - 20, text_y - text_height // 2 - 30), (text_x + text_width, text_y + text_height // 2), background_color, -1)
-        cv2.putText(frame, text, (text_x, text_y), font, font_scale, text_color, thickness)
-
-        # Draw "W" with black background
-        text = 'W'
-        (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
-        text_x = 10
-        text_y = mid_y
-        cv2.rectangle(frame, (text_x - 5, text_y - text_height // 2 - 30), (text_x + text_width, text_y + text_height // 2), background_color, -1)
-        cv2.putText(frame, text, (text_x, text_y), font, font_scale, text_color, thickness)
-
-        return frame
+        return overlay
+        
     
     @staticmethod
     def draw_boxes(frame, prediction_results, direction_results):

@@ -11,7 +11,8 @@ class Configuration:
     TRACKER_CONFIDENCE = 0.5
     TRACKER_IOU = 0.5
     MODEL_IMGSZ = 960
-    TRACKER_CKPT_PATH = os.path.join(root, "weights", "yolo11l.pt")
+    # TRACKER_CKPT_PATH = os.path.join(root, "weights", "yolo11l.pt")
+    TRACKER_CKPT_PATH = r"C:\Users\ASUS\Desktop\github_projects\Parking\runs\detect\train\weights\best.pt"
 
     # Rabbit
     RABBIT_CREDENTIALS_USERNAME = "guest"
@@ -23,8 +24,10 @@ class Configuration:
     RABBIT_PORT = "5672" 
 
     
-    VEHICLE_CLASSES = [1, 2, 3, 5, 7]
-    PERSON_CLASS = [0]
+    # VEHICLE_CLASSES = [1, 2, 3, 5, 7]
+    # PERSON_CLASS = [0]
+    VEHICLE_CLASSES = [0]
+
 
 
     #Visualization
